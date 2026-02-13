@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>HR GitHub Portfolio Review</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/hr.css"/>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-2">Candidate GitHub Evaluation</h1>
+    <p class="opacity-80 mb-8">HR-grade dashboard with animated insights</p>
+
+    <div class="glass p-6 md:p-8 rounded-2xl shadow-2xl">
+      <form method="post" class="grid md:grid-cols-6 gap-3">
+        <input name="url" required class="md:col-span-5 w-full px-4 py-3 rounded-xl text-slate-900"
+          placeholder="https://github.com/username"/>
+        <button class="btn-grad rounded-xl py-3 font-semibold">Analyze</button>
+      </form>
+
+      {% if err %}
+        <div class="mt-4 bg-red-500/20 border border-red-300/40 p-3 rounded-xl">{{ err }}</div>
+      {% endif %}
+
+      {% if data %}
+      <section class="mt-8 grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+        <div class="kpi glass p-4 rounded-xl">
+          <div class="label">Overall Rating</div>
+          <div class="value">⭐ {{ data.rating }}/10</div>
+          <span class="badge {{ 'green' if data.verdict_color=='green' else ('yellow' if data.verdict_color=='yellow' else 'red') }}">
+            {{ data.verdict }}
+          </span>
+        </div>
+        <div class="kpi glass p-4 rounded-xl">
+          <div class="label">Repositories</div>
+          <div class="value">{{ data.repos }}</div>
+          <div class="hint">Public repos</div>
+        </div>
+        <div class="kpi glass p-4 rounded-xl">
+          <div class="label">READMEs</div>
+          <div class="value">{{ data.readmes }}</div>
+          <div class="hint">Documentation</div>
+        </div>
+        <div class="kpi glass p-4 rounded-xl">
+          <div class="label">Stars</div>
+          <div class="value">{{ data.stars }}</div>
+          <div class="hint">Impact</div>
+        </div>
+      </section>
+
+      <section class="mt-6 grid lg:grid-cols-3 gap-6">
+        <div class="glass p-5 rounded-2xl">
+          <h3 class="text-xl font-semibold mb-2">Sub-score Radar</h3>
+          <canvas id="radar" height="200"></canvas>
+        </div>
+        <div class="glass p-5 rounded-2xl">
+          <h3 class="text-xl font-semibold mb-2">HR Positives (+)</h3>
+          <ul class="space-y-1">
+            {% for s in data.positives %}<li class="chip ok">✓ {{ s }}</li>{% endfor %}
+          </ul>
+        </div>
+        <div class="glass p-5 rounded-2xl">
+          <h3 class="text-xl font-semibold mb-2">HR Concerns (–)</h3>
+          <ul class="space-y-1">
+            {% for f in data.concerns %}<li class="chip warn">⚠ {{ f }}</li>{% endfor %}
+          </ul>
+        </div>
+      </section>
+
+      <section class="mt-6 glass p-5 rounded-2xl">
+        <h3 class="text-xl font-semibold mb-2">What to Improve (Next Steps)</h3>
+        <ol class="list-decimal list-inside space-y-1">
+          {% for t in data.actions %}<li>🛠️ {{ t }}</li>{% endfor %}
+        </ol>
+      </section>
+
+      <script>
+        const labels = {{ data.subs.keys()|list|tojson }};
+        const values = {{ data.subs.values()|list|tojson }};
+      </script>
+      <script src="/static/hr.js"></script>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
